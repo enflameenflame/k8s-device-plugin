@@ -1,0 +1,45 @@
+#
+# The prerequisites: Kubernetes version >= 1.10
+#
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: enflame-device-plugin-daemonset
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: enflame-device-plugin-ds
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: enflame-device-plugin-ds
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+    spec:
+      priorityClassName: system-node-critical
+      tolerations:
+      - key: enflame.com/dtu
+        operator: Exists
+        effect: NoSchedule
+      - key: CriticalAddonsOnly
+        operator: Exists
+      containers:
+      - name: enflame-device-plugin
+        image: enflame/k8s-device-plugin:v1.11GA
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: 
+            - all
+        volumeMounts:
+          - name: device-plugin-volume
+            mountPath: /var/lib/kubelet/device-plugins
+      volumes:
+        - name: device-plugin-volume
+          hostPath:
+            path: /var/lib/kubelet/device-plugins
