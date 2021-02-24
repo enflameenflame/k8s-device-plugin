@@ -29,7 +29,7 @@ spec:
         operator: Exists
       containers:
       - name: enflame-device-plugin
-        image: enflame/k8s-device-plugin:v1.11GA
+        image: enflame/k8s-device-plugin:latest
         imagePullPolicy: IfNotPresent
         securityContext:
           allowPrivilegeEscalation: false
